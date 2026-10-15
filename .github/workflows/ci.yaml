@@ -1,0 +1,25 @@
+# Runs the unit tests and builds the bundle (signed ad hoc) on every pull request and on main.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: Toolchain
+        run: swift --version
+      - name: Test
+        run: swift test
+      - name: Bundle
+        run: scripts/bundle.sh

@@ -1,0 +1,59 @@
+// The CLI's helpers: which app receives nightcrawler:// links, the version of the bundle
+// this binary ships in, and plain-text tables.
+
+import AppKit
+import ArgumentParser
+import Foundation
+import NightcrawlerCore
+
+enum LinkHandler {
+    /// The app macOS hands nightcrawler:// links to, or nil when none claims them.
+    static var app: URL? {
+        Link.url(forSite: "check").flatMap { NSWorkspace.shared.urlForApplication(toOpen: $0) }
+    }
+
+    static func finding() -> Finding {
+        guard let app else {
+            return Finding(.problem, "no app receives \(Identity.scheme):// links; install Nightcrawler.app and open it once")
+        }
+        let id = Bundle(url: app)?.bundleIdentifier ?? "unknown"
+        guard id == Identity.bundleID else {
+            return Finding(.problem, "\(Identity.scheme):// links go to \(app.path) (\(id)), not Nightcrawler")
+        }
+        return Finding(.ok, "\(Identity.scheme):// links go to \(app.path)")
+    }
+
+    static func open(_ url: URL) throws {
+        guard app != nil else {
+            throw ValidationError("no app receives \(Identity.scheme):// links; install Nightcrawler.app and open it once")
+        }
+        guard NSWorkspace.shared.open(url) else {
+            throw ValidationError("macOS did not open \(url.absoluteString)")
+        }
+    }
+}
+
+enum Version {
+    /// The version in the Info.plist of the Nightcrawler.app this binary sits in
+    /// (Contents/Helpers/nightcrawler), following Homebrew's symlink to it.
+    static var current: String {
+        guard let executable = Bundle.main.executableURL?.resolvingSymlinksInPath() else { return "dev" }
+        let plist = executable.deletingLastPathComponent().deletingLastPathComponent().appendingPathComponent("Info.plist")
+        guard let info = NSDictionary(contentsOf: plist), let version = info["CFBundleShortVersionString"] as? String else {
+            return "dev (not inside Nightcrawler.app)"
+        }
+        return version
+    }
+}
+
+enum Table {
+    static func render(header: [String], rows: [[String]]) -> String {
+        let all = [header] + rows
+        let widths = header.indices.map { column in all.map { $0[column].count }.max() ?? 0 }
+        return all.map { row in
+            row.enumerated().map { column, cell in
+                column == row.count - 1 ? cell : cell.padding(toLength: widths[column] + 2, withPad: " ", startingAt: 0)
+            }.joined()
+        }.joined(separator: "\n")
+    }
+}
