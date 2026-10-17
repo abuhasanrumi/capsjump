@@ -154,8 +154,9 @@ capsjump init</code></pre>
       <h3>Moving from stigmer/tap</h3>
       <p>CapsJump used to install from <code>stigmer/tap</code>. Homebrew doesn't move an installed cask from one tap to another by itself, so if you installed it from there, move it once:</p>
 <pre><code>brew uninstall --cask capsjump
-brew install --cask whysosuresh/tap/capsjump</code></pre>
-      <p>Your Accessibility permission, start-at-login and <code>~/.capsjump.yaml</code> stay as they are.</p>
+brew install --cask whysosuresh/tap/capsjump
+open -a CapsJump</code></pre>
+      <p>The uninstall quits CapsJump, so the last line starts it again. Your Accessibility permission, start-at-login and <code>~/.capsjump.yaml</code> stay as they are.</p>
     </section>
 
     <section class="notes">
