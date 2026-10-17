@@ -35,9 +35,10 @@ CapsJump used to install from `stigmer/tap`. Homebrew doesn't move an installed 
 ```sh
 brew uninstall --cask capsjump
 brew install --cask whysosuresh/tap/capsjump
+open -a CapsJump
 ```
 
-Your Accessibility permission, start-at-login and `~/.capsjump.yaml` stay as they are.
+The uninstall quits CapsJump, so the last line starts it again. Your Accessibility permission, start-at-login and `~/.capsjump.yaml` stay as they are.
 
 ## Configure
 
